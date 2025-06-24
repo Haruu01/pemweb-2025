@@ -3,6 +3,11 @@ services:
     build:
       context: ./php
     container_name: pemweb_php
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan --version"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
     volumes:
       - ./src:/var/www/html
     environment:
@@ -14,6 +19,11 @@ services:
     build:
       context: ./nginx
     container_name: pemweb_nginx
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -fsSL https://pemweb.test || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
     ports:
       - "443:443"
       - "80:80"
@@ -27,6 +37,11 @@ services:
   db:
     image: mariadb:10.11
     container_name: pemweb_db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "13306:3306"
     environment:
